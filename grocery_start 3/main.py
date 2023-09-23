@@ -1,27 +1,26 @@
+import flask
+from controller.item_resource import ItemController
+from repository.item_repository import ItemRepository
 
-import csv
-
-
-# data = [{'name': 'John Doe', 'age': 30}, {'name': 'Jane Doe', 'age': 25}]
-def write_list_of_dicts_to_csv(filename, data):
-    with open(filename, 'w') as f:
-        writer = csv.DictWriter(f, fieldnames=data[0].keys())
-        writer.writeheader()
-        writer.writerows(data)
+item_repository = ItemRepository()
+app = flask.Flask(__name__)
+item_controller = ItemController(item_repository)
 
 
-def read_csv_to_dict(filename):
-    with open(filename, 'r') as f:
-        reader = csv.DictReader(f)
-        return list(reader)
+@app.route('/item', methods=['GET'])
+def get_items():
+    return item_controller.get_items()
 
 
-def main(filename):
-    data = read_csv_to_dict(filename)
-    for row in data:
-        print(row)
+@app.route('/item', methods=['POST'])
+def add_item():
+    return item_controller.add_item()
 
 
-# Press the green button in the gutter to run the script.
+@app.route('/item/<sku>', methods=['DELETE'])
+def delete_item(sku):
+    return item_controller.delete_item(sku)
+
+
 if __name__ == '__main__':
-    main('sample_grocery.csv')
+    app.run(debug=True)
